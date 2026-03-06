@@ -374,7 +374,7 @@
         overflow-hidden
         flex
         items-start
-        justify-end;
+        justify-end
     }
 
     .activity-delete-background {
@@ -388,7 +388,8 @@
         translate-x-1/2
         -translate-y-1/2
         rotate-45
-        origin-center;
+        origin-center
+        group-hover:bg-red-500
     }
     .activity-delete-button {
         @apply

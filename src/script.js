@@ -85,7 +85,7 @@ function renderUserTags() {
                   style="border-color: ${tag.color}; color: ${tag.color}; background-color: ${tag.color}20">
                 ${tag.name}
             </span>
-            <button class="tag-menu-button bg-activity-delete p-0.5 rounded text-xs" 
+            <button class="tag-menu-button bg-activity-delete p-0.5 rounded text-xs hover:bg-red-500" 
                     onclick="deleteUserTag(${index})">X</button>
         `;
         tagList.appendChild(li);
@@ -297,7 +297,8 @@ function renderUserActivities(filter = "") {
                         oninput="autoResize(this)"
                         onblur="updateActivityDescription(${index}, this.value)"
                     >${activity.description || ''}</textarea>
-                    <div class="activity-delete-background"></div>
+                    <div class="activity-delete group">
+                        <div class="activity-delete-background"></div>
                         <button class="activity-delete-button" onclick="deleteUserActivity(${index})">X</button>
                     </div>
                 </div>
