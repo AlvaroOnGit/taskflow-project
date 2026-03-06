@@ -16,7 +16,7 @@
             <span class="material-symbols-outlined">menu_open</span>
         </button>
         <button class="navbar-buttons" id="button-toggle-theme">
-            <span class="material-symbols-outlined">routine</span>
+            <span id="theme-toggle-icon" class="material-symbols-outlined">routine</span>
         </button>
     </section>
 </header>
@@ -27,14 +27,14 @@
             <ul class="flex flex-col items-center lg:block">
                 <li class="sidebar-item">Dashboard</li>
                 <li class="sidebar-item">
-                    <div class="sidebar-tag-menu">
+                    <div id="sidebar-tag-menu" class="sidebar-tag-menu">
                         <span>Etiquetas</span>
                         <span id="tag-menu-icon" class="material-symbols-outlined">keyboard_arrow_down</span>
                     </div>
                     <div id="tag-menu-collapsible" class="tag-menu-collapsible">
-                        <form class="tag-menu-form">
+                        <form id="tag-menu-form" class="tag-menu-form">
                             <input type="text" id="new-tag-input" placeholder="Nueva etiqueta" class="input text-xs flex-1 min-w-0">
-                            <input type="color" id="tag-color-input" value="#000000" class="tag-menu-color-picker">
+                            <input type="color" id="tag-color-input" value="#58bbaf" class="tag-menu-color-picker">
                             <button class="tag-menu-button">+</button>
                         </form>
                         <ul class="tag-menu-list" id="tag-menu-list">
@@ -48,12 +48,11 @@
     </aside>
     <main class="content">
         <section class="activity-filter activity-panel">
-            <label for="search" class="sr-only">Buscar actividad</label>
-            <input type="text" id="search" placeholder="Buscar actividad..." class="input" />
+            <input type="text" id="activity-filter-search" placeholder="Buscar actividad..." class="input" />
         </section>
         <section class="activity-composer activity-panel">
-            <form class="activity-form">
-                <input type="text" placeholder="Añadir una actividad" class="input">
+            <form id="activity-form" class="activity-form">
+                <input id="activity-composer-input" type="text" placeholder="Añadir una actividad" class="input">
                 <div class="activity-tag-wrapper relative">
                     <button id="activity-tag-selector" type="button" class="input flex justify-between items-center w-full">
                         <span id="selected-value">Etiquetas</span>
@@ -68,7 +67,7 @@
             </div>
         </section>
         <section class="activity-list">
-            <ul class="activity-container">
+            <ul id="activity-container" class="activity-container">
                 <li>
                     <article class="activity-item">
                         <div class="activity-data">
@@ -88,47 +87,6 @@
                             </div>
                         </div>
                     </article>
-                </li>
-                <li>
-                    <article class="activity-item">
-                        <div class="activity-data">
-                            <div class="activity-info">
-                                <h3>Activity Title</h3>
-                                <div class="activity-tags">
-                                    <span class="activity-tag">Test</span>
-                                    <span class="activity-tag">Test</span>
-                                    <span class="activity-tag">Test</span>
-                                    <span class="activity-tag">Test</span>
-                                </div>
-                            </div>
-                            <input placeholder="Activity description...."></input>
-                            <div class="activity-delete">
-                                <div class="activity-delete-background"></div>
-                                <button class="activity-delete-button">X</button>
-                            </div>
-                        </div>
-                    </article>
-                </li>
-                <li>
-                    <article class="activity-item">
-                        <div class="activity-data">
-                            <div class="activity-info">
-                                <h3>Activity Title</h3>
-                                <div class="activity-tags">
-                                    <span class="activity-tag">Test</span>
-                                    <span class="activity-tag">Test</span>
-                                    <span class="activity-tag">Test</span>
-                                    <span class="activity-tag">Test</span>
-                                </div>
-                            </div>
-                            <input placeholder="Activity description....">
-                            <div class="activity-delete">
-                                <div class="activity-delete-background"></div>
-                                <button class="activity-delete-button">X</button>
-                            </div>
-                        </div>
-                    </article>
-                </li>
             </ul>
         </section>
     </main>
