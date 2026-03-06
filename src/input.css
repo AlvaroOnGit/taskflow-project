@@ -1,0 +1,397 @@
+@import "tailwindcss";
+
+@theme {
+    --color-primary: rgb(107, 85, 187);
+    --color-secondary: rgb(72, 41, 124);
+    --color-low-opacity: rgba(0, 0, 0, 0.15);
+    --color-medium-opacity: rgba(0, 0, 0, 0.3);
+    --color-primary-dark: rgb(28,28,28);
+    --color-secondary-dark: rgb(50,50,50);
+    --color-tertiary-dark: rgb(80, 80, 80);
+    --color-border-primary: rgba(184, 184, 184, 0.6);
+    --color-hover-primary: rgba(255, 255, 255, 0.1);
+    --color-activity-delete: rgba(213, 43, 43, 0.7);
+    --color-tag-color: rgba(0,0,0);
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer components {
+
+    .input {
+        @apply
+        bg-secondary
+        text-sm
+        w-full
+        p-0.5
+        border
+        rounded-xl
+        border-border-primary
+        dark:bg-primary-dark
+    }
+
+    .input:focus {
+        @apply
+        outline-none
+    }
+
+    .navbar-buttons {
+        @apply
+        cursor-pointer
+        hover:scale-110
+        transition-transform
+        duration-400
+        will-change-transform
+    }
+
+    .header {
+        @apply
+        flex
+        justify-between
+        items-center
+        h-4
+        p-1
+        bg-secondary
+        dark:bg-secondary-dark
+        z-50
+        sticky
+        top-0
+        w-full
+    }
+
+    .layout {
+        @apply
+        w-full
+        flex
+        flex-col
+        relative
+        m-auto
+        p-1
+        gap-1
+        lg:flex-row
+        lg:max-w-max
+    };
+
+    .sidebar {
+        @apply
+        fixed
+        top-5
+        z-40
+        max-h-[70vh]
+        w-[90%]
+        mx-auto
+        flex
+        flex-col
+        p-1
+        h-auto
+        overflow-y-auto
+        border
+        rounded-2xl
+        border-border-primary
+        bg-secondary
+        dark:bg-secondary-dark
+        transition-all
+        duration-500
+        ease-in-out
+        -translate-y-full
+        opacity-0
+        pointer-events-none
+        shadow-2xl
+        shadow-black/60
+        lg:relative
+        lg:translate-y-0
+        lg:opacity-100
+        lg:pointer-events-auto
+        lg:h-[calc(100vh-64px)]
+        lg:w-20
+        lg:top-0
+        lg:max-h-full
+        lg:shadow-none
+        lg:bg-low-opacity
+    };
+
+    .sidebar.is-open {
+        @apply
+        translate-y-0
+        opacity-100
+        pointer-events-auto;
+    }
+
+    .sidebar-item {
+        @apply
+        mt-1
+        p-0.5
+        font-semibold
+        text-lg
+        transition-transform
+        duration-400
+        will-change-transform
+        rounded-2xl
+        cursor-pointer
+        hover:bg-low-opacity
+    };
+
+    .sidebar-item.is-active {
+        @apply
+        bg-low-opacity
+        cursor-auto
+    }
+
+    .sidebar-item.is-active .tag-menu-collapsible {
+        @apply flex;
+    }
+
+    .sidebar-tag-menu {
+        @apply
+        flex
+        items-start
+        justify-between
+        cursor-pointer
+    }
+
+    .tag-menu-collapsible {
+        @apply
+        hidden
+        flex-col
+        overflow-hidden
+        transition-all
+        duration-300;
+    }
+
+    .tag-menu-form {
+        @apply
+        flex
+        items-center
+        pt-1
+        pb-1
+        gap-0.5
+        border-b
+        border-border-primary
+    }
+
+    .tag-menu-button {
+        @apply
+        h-2
+        w-2
+        cursor-pointer
+        border
+        rounded-xl
+        border-border-primary
+        bg-medium-opacity
+        hover:bg-hover-primary
+    }
+
+    .tag-menu-color-picker {
+        @apply
+        cursor-pointer
+        p-0
+        h-2 w-2
+        rounded-full
+        border
+        border-border-primary
+        overflow-hidden
+        appearance-none
+        bg-transparent;
+    }
+
+    .tag-menu-item {
+        @apply
+        pt-1
+        flex
+        items-start
+        justify-between
+    }
+
+    .content {
+        @apply
+        flex-col
+        min-w-0
+    }
+
+    .activity-panel {
+        @apply
+        bg-low-opacity
+        p-1
+        mb-1
+        border
+        rounded-2xl
+        border-border-primary
+        dark:bg-secondary-dark
+        lg:max-w-50
+    };
+
+    .activity-form {
+        @apply
+        flex
+        flex-col
+        items-stretch
+        gap-1
+        pb-1
+        lg:flex-1
+        lg:flex-row
+        lg:items-center
+    }
+
+    .activity-tag-options {
+        @apply
+        absolute
+        z-10
+        w-full
+        mt-1
+        border
+        rounded-xl
+        border-border-primary
+        bg-secondary
+        dark:bg-secondary-dark
+    }
+
+    .activity-tag-options:hover {
+    }
+
+    .activity-form button {
+        @apply
+        p-0.5 pr-1 pl-1
+        cursor-pointer
+        border
+        rounded-xl
+        border-border-primary
+        bg-medium-opacity
+        hover:bg-hover-primary
+    }
+
+    .activity-composer-tags{
+        @apply
+        flex
+        flex-wrap
+        items-center
+        gap-1
+        w-full;
+    }
+
+    .activity-item {
+        @apply
+        relative
+        overflow-hidden
+        p-1
+        mb-1
+        border
+        rounded-2xl
+        bg-low-opacity
+        border-border-primary
+        dark:bg-secondary-dark
+        lg:w-50
+    }
+
+    .activity-data {
+        @apply
+        flex-col
+        pr-0.5
+        items-start
+        justify-between
+        lg:flex-row
+        lg:pr-1
+    }
+
+    .activity-data input{
+        @apply
+        text-sm
+        w-full
+        text-neutral-400
+    }
+
+    .activity-data input:focus{
+        @apply
+        outline-none
+    }
+
+    .activity-info {
+        @apply
+        flex
+        flex-col
+        gap-0.5
+        pb-0.5
+        justify-between
+        lg:flex-row
+        lg:pb-0
+    }
+
+    .activity-info h3{
+        @apply
+        text-lg
+        font-semibold
+    }
+
+    .activity-tags {
+        @apply
+        flex
+        items-center
+        gap-0.5
+    }
+
+    .activity-tag {
+        @apply
+        text-sm
+        p-0.5
+        border
+        rounded-xl
+        border-border-primary
+        bg-low-opacity
+    }
+
+    .activity-delete {
+        @apply
+        absolute
+        top-0
+        right-0
+        w-3
+        h-3
+        overflow-hidden
+        flex
+        items-start
+        justify-end;
+    }
+
+    .activity-delete-background {
+        @apply
+        absolute
+        top-0
+        right-0
+        w-full
+        h-full
+        bg-activity-delete
+        translate-x-1/2
+        -translate-y-1/2
+        rotate-45
+        origin-center;
+    }
+    .activity-delete-button {
+        @apply
+        relative
+        z-10
+        text-white
+        font-bold
+        text-xs
+        mt-[2px]
+        mr-[7px]
+        cursor-pointer
+    }
+}
+
+:root {
+    --spacing: 1rem;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+    @apply p-0;
+}
+input[type="color"]::-webkit-color-swatch {
+    @apply border-none rounded-full;
+}
+
+input[type="color"]::-moz-color-swatch {
+    @apply border-none rounded-full;
+}
