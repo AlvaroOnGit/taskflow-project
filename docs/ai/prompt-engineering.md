@@ -1,0 +1,2 @@
+Técnicas y patrones para escribir prompts efectivos. Cubre estructuras como chain-of-thought, few-shot examples, 
+role prompting, y ejemplos concretos de prompts que funcionan bien para distintas tareas del proyecto.

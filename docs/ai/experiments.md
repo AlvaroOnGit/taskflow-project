@@ -1,0 +1,2 @@
+Registro de experimentos realizados con IA: qué se probó, con qué modelo, qué prompt se usó, el resultado obtenido 
+y las conclusiones. Funciona como un diario de iteraciones para no repetir experimentos fallidos.
