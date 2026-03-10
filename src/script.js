@@ -126,7 +126,7 @@ function saveAndRenderTags() {
 
     localStorage.setItem('tags', JSON.stringify(tags));
     renderUserTags();
-    updateTagSelector();
+    syncComposerTagsUI();
 }
 
 /**
@@ -248,14 +248,35 @@ document.addEventListener('click', () => {
 });
 
 /**
- * Renderiza las opciones del selector de etiquetas del composer.
- * - Filtra `tags` para ocultar las ya seleccionadas en `selectedTagsForNewActivity`
- * - Crea un `<li>` por etiqueta y al hacer clic la añade a la selección
+ * Sincroniza la UI del *composer* de actividades con el estado actual:
+ * - Renderiza las etiquetas seleccionadas debajo del composer
+ * - Renderiza las opciones disponibles en el selector, excluyendo las ya seleccionadas
  *
  * @returns {void}
  */
-function updateTagSelector() {
+function syncComposerTagsUI() {
 
+    // Etiquetas seleccionadas debajo del composer
+    tagContainer.innerHTML = '';
+    selectedTagsForNewActivity.forEach((tag, index) => {
+        const span = document.createElement('span');
+
+        span.className = 'activity-tag cursor-pointer hover:!bg-red-500/50 hover:!border-red-500 hover:!text-red-500 transition-opacity border p-0.5 rounded-lg text-xs font-bold';
+
+        span.style.color = tag.color;
+        span.style.borderColor = tag.color;
+        span.style.backgroundColor = `color-mix(in srgb, ${tag.color} 15%, transparent)`;
+        span.textContent = tag.name;
+
+        span.onclick = () => {
+            selectedTagsForNewActivity.splice(index, 1);
+            syncComposerTagsUI();
+        };
+
+        tagContainer.appendChild(span);
+    });
+
+    // Opciones disponibles en el selector
     tagOptions.innerHTML = '';
 
     const availableTags = tags.filter(tag =>
@@ -282,35 +303,6 @@ function updateTagSelector() {
 }
 
 /**
- * Renderiza las etiquetas seleccionadas para la nueva actividad debajo del composer.
- * Permite de seleccionar una etiqueta haciendo clic sobre ella.
- *
- * @returns {void}
- */
-function renderComposerTags() {
-
-    tagContainer.innerHTML = '';
-    selectedTagsForNewActivity.forEach((tag, index) => {
-        const span = document.createElement('span');
-
-        span.className = 'activity-tag cursor-pointer hover:!bg-red-500/50 hover:!border-red-500 hover:!text-red-500 transition-opacity border p-0.5 rounded-lg text-xs font-bold';
-
-        span.style.color = tag.color;
-        span.style.borderColor = tag.color;
-        span.style.backgroundColor = `color-mix(in srgb, ${tag.color} 15%, transparent)`;
-        span.textContent = tag.name;
-
-        span.onclick = () => {
-            selectedTagsForNewActivity.splice(index, 1);
-            renderComposerTags();
-            updateTagSelector();
-        };
-
-        tagContainer.appendChild(span);
-    });
-}
-
-/**
  * Añade una etiqueta a `selectedTagsForNewActivity` si no estaba ya seleccionada.
  * Luego actualiza la UI del composer y las opciones del selector.
  *
@@ -322,12 +314,11 @@ function addTagToSelection(tagName, tagColor) {
 
     if (tagName && !selectedTagsForNewActivity.some(t => t.name === tagName)) {
         selectedTagsForNewActivity.push({ name: tagName, color: tagColor });
-        renderComposerTags();
-        updateTagSelector();
+        syncComposerTagsUI();
     }
 }
 
-updateTagSelector();
+syncComposerTagsUI();
 
 /**
  * Renderiza la lista de actividades en `#activity-container`.
@@ -439,8 +430,7 @@ activityComposerForm.addEventListener('submit', (e) => {
 
     selectedTagsForNewActivity.length = 0
     activityComposerInput.value = "";
-    renderComposerTags();
-    updateTagSelector();
+    syncComposerTagsUI();
     saveAndRenderActivities();
 })
 
