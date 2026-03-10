@@ -31,7 +31,13 @@ renderUserTags();
 renderUserActivities();
 
 /**
- * Handles the button to enable and disable darkmode
+ * Inicializa el tema (dark/light) cuando el DOM está listo.
+ * - Lee el tema guardado en `localStorage` (clave: `theme`)
+ * - Aplica/elimina la clase `dark` en `<html>`
+ * - Actualiza el icono del botón de tema y registra el clic para alternarlo
+ *
+ * @listens document#DOMContentLoaded
+ * @returns {void}
  */
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -50,6 +56,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     updateButtonUI(isDark);
 
+
+    /**
+    * Alterna el tema entre oscuro y claro.
+    * - Alterna la clase `dark` en `<html>`
+    * - Persiste el valor en `localStorage` (clave: `theme`)
+    * - Actualiza el icono del botón
+    *
+    * @listens HTMLElement#click
+    * @returns {void}
+    */
     themeIcon.addEventListener('click', () => {
 
         isDark = html.classList.toggle('dark');
@@ -61,16 +77,22 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /**
- * Handles the functionality for rendering the sidebar on mobile
+ * Alterna la visibilidad del sidebar en móvil.
+ * Agrega o quita la clase `is-open` en el elemento `#sidebar`.
+ *
+ * @listens HTMLElement#click
+ * @returns {void}
  */
 sidebarMobileToggle.addEventListener('click', () => {
 
     sidebar.classList.toggle('is-open');
 });
 
-// TAGS
 /**
- * Handles the functionality for rendering the users tags on the sidebar
+ * Renderiza las etiquetas del usuario en el menú del sidebar.
+ * Usa el estado global `tags` y repinta el contenedor `#tag-menu-list`.
+ *
+ * @returns {void}
  */
 function renderUserTags() {
 
@@ -93,8 +115,12 @@ function renderUserTags() {
 }
 
 /**
- * Saves the tag to localStorage and calls for the rendering of the tags
- * It also calls for an update on the tag selector on the activity composer
+ * Guarda `tags` en `localStorage` y actualiza la UI relacionada.
+ * - Persiste `tags` bajo la clave `tags`
+ * - Re-renderiza la lista del sidebar
+ * - Re-renderiza las opciones del selector de etiquetas del composer
+ *
+ * @returns {void}
  */
 function saveAndRenderTags() {
 
@@ -104,9 +130,19 @@ function saveAndRenderTags() {
 }
 
 /**
- * Handles the functionality to create tags
- * Fails if the tag name is blank, or it already exists
- * If the tag is valid, it calls for rendering and saving on localStorage
+ * Crea una nueva etiqueta desde el formulario del sidebar.
+ * Reglas:
+ * - No permite nombre vacío
+ * - No permite duplicados por nombre
+ *
+ * Si es válida:
+ * - Añade `{ name, color }` a `tags`
+ * - Persiste y re-renderiza con `saveAndRenderTags()`
+ * - Limpia el input de nombre
+ *
+ * @param {SubmitEvent} e Evento de submit del formulario.
+ * @listens HTMLFormElement#submit
+ * @returns {void}
  */
 tagForm.addEventListener("submit", (e) => {
 
@@ -128,8 +164,10 @@ tagForm.addEventListener("submit", (e) => {
 })
 
 /**
- * Handles the deletion of tags
- * Calls for rendering to update the tag list
+ * Elimina una etiqueta por índice del array `tags` y actualiza persistencia/UI.
+ *
+ * @param {number} index Índice de la etiqueta a borrar.
+ * @returns {void}
  */
 window.deleteUserTag = (index) => {
 
@@ -138,8 +176,12 @@ window.deleteUserTag = (index) => {
 };
 
 /**
- * Handles the "collapse" of the tag menu
- * It also changes the arrow icon depending on context
+ * Alterna el colapso del menú de etiquetas del sidebar.
+ * - Alterna la clase `is-active` en el item contenedor
+ * - Cambia el icono entre `keyboard_arrow_down` y `keyboard_arrow_up`
+ *
+ * @listens HTMLElement#click
+ * @returns {void}
  */
 sidebarTagMenu.addEventListener('click', () => {
 
@@ -153,6 +195,13 @@ sidebarTagMenu.addEventListener('click', () => {
     }
 });
 
+/**
+ * Evita que los clics dentro del contenido colapsable propaguen al toggle del menú.
+ *
+ * @param {MouseEvent} e Evento de clic.
+ * @listens HTMLElement#click
+ * @returns {void}
+ */
 sidebarTagMenuCollapsibleContent.addEventListener('click', (e) => {
     e.stopPropagation();
 });
@@ -161,8 +210,13 @@ sidebarTagMenuCollapsibleContent.addEventListener('click', (e) => {
 let selectedTagsForNewActivity = [];
 
 /**
- * Handles the functionality of the activity selector
- * It also changes the arrow icon depending on context
+ * Abre/cierra el selector de etiquetas del composer.
+ * - Evita propagación para que el clic no dispare el cierre global del documento
+ * - Alterna la clase `hidden` en `#activity-tag-options`
+ * - Actualiza el icono del selector
+ *
+ * @param {MouseEvent} e Evento de clic.
+ * @returns {void}
  */
 tagSelector.onclick = (e) => {
 
@@ -178,7 +232,11 @@ tagSelector.onclick = (e) => {
 };
 
 /**
- * Handles the arrow icon for the tag selector on the activity composer
+ * Cierra el desplegable del selector de etiquetas cuando se hace clic fuera.
+ * También restablece el icono a `keyboard_arrow_down` si estaba abierto.
+ *
+ * @listens Document#click
+ * @returns {void}
  */
 document.addEventListener('click', () => {
 
@@ -190,8 +248,11 @@ document.addEventListener('click', () => {
 });
 
 /**
- * Updates the tag selector with the currently available tags
- * Hides already selected tags to avoid duplicates
+ * Renderiza las opciones del selector de etiquetas del composer.
+ * - Filtra `tags` para ocultar las ya seleccionadas en `selectedTagsForNewActivity`
+ * - Crea un `<li>` por etiqueta y al hacer clic la añade a la selección
+ *
+ * @returns {void}
  */
 function updateTagSelector() {
 
@@ -221,8 +282,10 @@ function updateTagSelector() {
 }
 
 /**
- * Renders the currently selected tags below the composer
- * Allows the user to delete selected tags as well
+ * Renderiza las etiquetas seleccionadas para la nueva actividad debajo del composer.
+ * Permite de seleccionar una etiqueta haciendo clic sobre ella.
+ *
+ * @returns {void}
  */
 function renderComposerTags() {
 
@@ -248,8 +311,12 @@ function renderComposerTags() {
 }
 
 /**
- * Handles the addition of tags to the `selectedTagsForNewActivity` array
- * Updates the tag selector afterward
+ * Añade una etiqueta a `selectedTagsForNewActivity` si no estaba ya seleccionada.
+ * Luego actualiza la UI del composer y las opciones del selector.
+ *
+ * @param {string} tagName Nombre de la etiqueta.
+ * @param {string} tagColor Color CSS asociado a la etiqueta (normalmente hex).
+ * @returns {void}
  */
 function addTagToSelection(tagName, tagColor) {
 
@@ -262,12 +329,18 @@ function addTagToSelection(tagName, tagColor) {
 
 updateTagSelector();
 
-
-//Activities
 /**
- * Handles the functionality for rendering the users activities
+ * Renderiza la lista de actividades en `#activity-container`.
+ * Cada actividad muestra:
+ * - Título (`activity.name`)
+ * - Etiquetas (`activity.tags`)
+ * - Textarea de descripción (con autoresize y persistencia onBlur)
+ *
+ * Nota: `filter` existe, pero actualmente no se usa dentro de la función.
+ *
+ * @returns {void}
  */
-function renderUserActivities(filter = "") {
+function renderUserActivities() {
 
     activityContainer.innerHTML = '';
 
@@ -310,7 +383,10 @@ function renderUserActivities(filter = "") {
 }
 
 /**
- * Handles the resizing of the textarea to control overflow on runtime
+ * Ajusta automáticamente la altura de un `<textarea>` al contenido para evitar overflow.
+ *
+ * @param {HTMLTextAreaElement} textarea Textarea cuyo alto se ajusta.
+ * @returns {void}
  */
 function autoResize(textarea) {
 
@@ -319,8 +395,9 @@ function autoResize(textarea) {
 }
 
 /**
- * Handles the functionality for saving user activities to localStorage
- * Calls for the rendering of activities afterward
+ * Guarda el array `activities` en `localStorage` y repinta la lista.
+ *
+ * @returns {void}
  */
 function saveAndRenderActivities() {
 
@@ -329,8 +406,20 @@ function saveAndRenderActivities() {
 }
 
 /**
- * Handles the creation of activities
- * Clears the tag container on the composer after creation
+ * Crea una nueva actividad desde el formulario del composer.
+ * Reglas:
+ * - No permite nombre vacío
+ * - No permite duplicados por nombre
+ *
+ * Si es válida:
+ * - Crea `{ name, tags, description }`
+ * - Resetea `selectedTagsForNewActivity` y limpia el input
+ * - Re-renderiza tags del composer y opciones del selector
+ * - Persiste y repinta actividades
+ *
+ * @param {SubmitEvent} e Evento de submit del formulario.
+ * @listens HTMLFormElement#submit
+ * @returns {void}
  */
 activityComposerForm.addEventListener('submit', (e) => {
 
@@ -356,8 +445,11 @@ activityComposerForm.addEventListener('submit', (e) => {
 })
 
 /**
- * Updates the description value of the activity on localStorage
- * Calls for the rendering of activities afterward
+ * Actualiza la descripción de una actividad por índice y persiste el cambio.
+ *
+ * @param {number} index Índice de la actividad en `activities`.
+ * @param {string} newValue Nuevo valor de descripción.
+ * @returns {void}
  */
 function updateActivityDescription(index, newValue) {
 
@@ -366,8 +458,10 @@ function updateActivityDescription(index, newValue) {
 }
 
 /**
- * Handles the deletion of activities
- * Calls for the rendering of activities afterward
+ * Elimina una actividad por índice del array `activities` y actualiza persistencia/UI.
+ *
+ * @param {number} index Índice de la actividad a borrar.
+ * @returns {void}
  */
 window.deleteUserActivity = (index) => {
 
@@ -376,9 +470,13 @@ window.deleteUserActivity = (index) => {
 };
 
 /**
- * Handles the filtering of activities
+ * Filtra visualmente las actividades ya renderizadas según el texto de búsqueda.
+ * Recorre los `<li>` y compara el término con el título (`.activity-info h3`),
+ * ocultando/mostrando cada item mediante `li.style.display`.
+ *
+ * @listens HTMLInputElement#input
+ * @returns {void}
  */
-
 activitySearch.addEventListener('input', () => {
 
     const activityList = document.querySelectorAll('.activity-container li');
