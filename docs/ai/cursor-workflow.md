@@ -1,2 +1,6 @@
-Flujo de trabajo con Cursor como editor de código con IA. Documentaría configuraciones recomendadas, 
-cómo aprovechar el chat y el autocompletado, integración con el proyecto y buenas prácticas.
+| Atajo | Acción | Propósito |
+|-------|--------|-----------|
+| `Cmd + K` | Inline Edit | Generar o modificar código directamente en el editor sobre una selección o línea vacía. |
+| `Cmd + L` | Chat Panel | Abrir el chat lateral. |
+| `Cmd + I` | Composer | Para cambios multiactivos y refactorizaciones complejas. |
+| `Cmd + Enter` | Chat with Context | En el chat, envía el prompt incluyendo todos los archivos abiertos o el contexto relevante. |
