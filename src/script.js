@@ -1,5 +1,8 @@
 //Header
 const themeIcon = document.getElementById('theme-toggle-icon')
+//Notification
+const notificationContainer = document.querySelector('.notification-container');
+const notificationMessage = document.getElementById('notification-message');
 //Sidebar
 const sidebar = document.getElementById('sidebar');
 const sidebarMobileToggle = document.getElementById('sidebar-mobile-toggle');
@@ -23,6 +26,58 @@ const activityComposerInput = document.getElementById('activity-composer-input')
 const activityContainer = document.getElementById('activity-container');
 //Filters
 const activitySearch = document.getElementById('activity-filter-search');
+
+const NOTIFICATION_TYPES = {
+    success: 'notification--success',
+    error: 'notification--error',
+    warning: 'notification--warning',
+};
+
+let notificationHideTimeout = null;
+
+/**
+ * Muestra una notificación durante X segundos.
+ *
+ * @param {string} message Texto a mostrar.
+ * @param {'success'|'error'|'warning'} [type='success'] Tipo de notificación.
+ * @param {number} [seconds=3] Segundos visibles.
+ * @returns {void}
+ */
+function showNotification(message, type = 'success', seconds = 3) {
+
+    if (!notificationContainer || !notificationMessage) return;
+
+    notificationMessage.textContent = message;
+
+    Object.values(NOTIFICATION_TYPES).forEach(cls => {
+        notificationContainer.classList.remove(cls);
+    });
+    const typeClass = NOTIFICATION_TYPES[type] || NOTIFICATION_TYPES.success;
+    notificationContainer.classList.add(typeClass);
+
+    notificationContainer.classList.add('notification--visible');
+
+    if (notificationHideTimeout) clearTimeout(notificationHideTimeout);
+
+    notificationHideTimeout = setTimeout(() => {
+        notificationContainer.classList.remove('notification--visible');
+    }, seconds * 1000);
+}
+
+/**
+ * Permite cerrar manualmente la notificación con el botón de dismiss.
+ */
+if (notificationContainer) {
+
+    notificationContainer.addEventListener('click', () => {
+
+        if (notificationHideTimeout) clearTimeout(notificationHideTimeout);
+        notificationContainer.classList.remove('notification--visible');
+    });
+}
+
+// Exponer helper de notificación globalmente
+window.showNotification = showNotification;
 
 let tags = JSON.parse(localStorage.getItem('tags')) || [];
 let activities = JSON.parse(localStorage.getItem('activities')) || [];
@@ -151,7 +206,14 @@ tagForm.addEventListener("submit", (e) => {
     const tagName = tagFormText.value.trim();
     const tagColor = tagFormColor.value;
 
-    if (tagName === "" || tags.some(t => t.name === tagName)) return;
+    if (tagName === ""){
+        showNotification('Etiqueta no puede estar vacía', 'warning', 3);
+        return;
+    }
+    else if (tags.some(t => t.name === tagName)) {
+        showNotification('Etiqueta ya existe', 'warning', 3);
+        return;
+    }
 
     const newTag = {
         name: tagName,
@@ -159,6 +221,7 @@ tagForm.addEventListener("submit", (e) => {
     }
 
     tags.push(newTag);
+    showNotification('Etiqueta creada', 'success', 3);
     saveAndRenderTags();
     tagFormText.value = "";
 })
@@ -418,7 +481,14 @@ activityComposerForm.addEventListener('submit', (e) => {
 
     const activityName = activityComposerInput.value;
 
-    if (activityName === "" || activities.some(a => a.name === activityName)) return;
+    if (activityName === "") {
+        showNotification('Actividad no puede estar vacía', 'warning', 3);
+        return;
+    }
+    else if (activities.some(a => a.name === activityName)) {
+        showNotification('Actividad ya existe', 'warning', 3);
+        return;
+    }
 
     const newActivity = {
         name: activityName,
@@ -427,6 +497,7 @@ activityComposerForm.addEventListener('submit', (e) => {
     }
 
     activities.push(newActivity);
+    showNotification('Actividad creada', 'success', 3);
 
     selectedTagsForNewActivity.length = 0
     activityComposerInput.value = "";

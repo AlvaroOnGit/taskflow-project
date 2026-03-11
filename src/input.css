@@ -3,6 +3,7 @@
 @theme {
     --color-primary: rgb(107, 85, 187);
     --color-secondary: rgb(72, 41, 124);
+    --color-tertiary: rgb(92, 72, 158);
     --color-low-opacity: rgba(0, 0, 0, 0.15);
     --color-medium-opacity: rgba(0, 0, 0, 0.3);
     --color-primary-dark: rgb(28,28,28);
@@ -71,6 +72,54 @@
         lg:flex-row
         lg:max-w-max
     };
+
+    .notification-container{
+        @apply
+        opacity-0
+        text-sm
+        text-center
+        w-[90%]
+        justify-between
+        z-2001
+        fixed
+        p-1
+        rounded-2xl
+        shadow-sm
+        shadow-black/60
+        bg-tertiary
+        -ml-2
+        transition-all
+        duration-200
+        ease-out
+        dark:bg-tertiary-dark
+        lg:max-w-25
+        lg:left-1/2
+        lg:top-1
+        lg:-translate-x-1/2
+    }
+
+    .notification-container:hover {
+        @apply
+        ml-1
+    }
+
+    .notification--success {
+        @apply bg-emerald-500;
+      }
+      .notification--error {
+        @apply bg-red-500;
+      }
+      .notification--warning {
+        @apply bg-amber-500 text-black;
+      }
+
+    .notification--visible {
+        @apply
+        opacity-100
+        ml-0
+        cursor-pointer
+        pointer-events-auto;
+    }
 
     .sidebar {
         @apply
@@ -247,7 +296,9 @@
 
     .activity-form button {
         @apply
-        p-0.5 pr-1 pl-1
+        p-0.5
+        pr-1
+        pl-1
         cursor-pointer
         border
         rounded-xl
