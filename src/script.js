@@ -293,6 +293,15 @@ let selectedTagsForNewActivity = [];
 tagSelector.onclick = (e) => {
 
     e.stopPropagation();
+    
+    // Si no hay opciones disponibles, no abrir el desplegable
+    if (tags.length === 0) {
+        showNotification("Debes crear al menos una etiqueta", "warning", 3)
+        return;
+    } else if (tagOptions.children.length === 0) {
+        showNotification("No hay más etiquetas", "warning", 3)
+        return;
+    }
 
     tagOptions.classList.toggle('hidden');
     if (tagSelectorIcon.textContent === 'keyboard_arrow_down') {
