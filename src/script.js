@@ -30,9 +30,6 @@ const activitySearch = document.getElementById('activity-filter-search');
 let tags = JSON.parse(localStorage.getItem('tags')) || [];
 let activities = JSON.parse(localStorage.getItem('activities')) || [];
 
-renderUserTags();
-renderUserActivities();
-
 const NOTIFICATION_TYPES = {
     success: 'notification--success',
     error: 'notification--error',
@@ -431,7 +428,7 @@ function renderUserActivities() {
             <article class="activity-item">
                 <div class="activity-data">
                     <div class="activity-info">
-                        <h3>${activity.name}</h3>
+                        <h3 onclick="startEditActivityTitle(${index}, this)">${activity.name}</h3>
                         <div class="activity-tags">
                             ${activityTags}
                         </div>
@@ -537,6 +534,87 @@ function updateActivityDescription(index, newValue) {
 }
 
 /**
+ * Permite editar el título de una actividad haciendo clic en él.
+ * Comportamiento similar a la descripción:
+ * - El usuario edita directamente en un campo de texto
+ * - Se guarda al perder el foco o al pulsar Enter
+ * - Escape cancela y restaura el valor original
+ *
+ * Reglas:
+ * - No permite título vacío
+ * - No permite duplicados por nombre con otras actividades
+ *
+ * @param {number} index Índice de la actividad en `activities`.
+ * @param {HTMLElement} titleElement Elemento `<h3>` clicado.
+ * @returns {void}
+ */
+window.startEditActivityTitle = (index, titleElement) => {
+
+    const currentName = activities[index]?.name ?? '';
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = currentName;
+    input.className = 'activity-title-input';
+
+    let isCancelled = false;
+
+    const commitChange = () => {
+
+        if (isCancelled) {
+            return;
+        }
+
+        const trimmedName = input.value.trim();
+
+        if (trimmedName === '') {
+            showNotification('Actividad no puede estar vacía', 'warning', 3);
+            input.focus();
+            return;
+        }
+
+        const nameAlreadyExists = activities.some((activity, i) =>
+            i !== index && activity.name === trimmedName
+        );
+
+        if (nameAlreadyExists) {
+            showNotification('Ya existe otra actividad con ese nombre', 'warning', 3);
+            input.focus();
+            return;
+        }
+
+        activities[index].name = trimmedName;
+        saveAndRenderActivities();
+        showNotification('Actividad actualizada', 'success', 3);
+    };
+
+    const cancelChange = () => {
+        // Marca como cancelado para que el blur no haga commit
+        isCancelled = true;
+        // Vuelve a pintar la lista para restaurar el título original
+        renderUserActivities();
+    };
+
+    input.addEventListener('blur', commitChange);
+
+    input.addEventListener('keydown', (event) => {
+
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            commitChange();
+        }
+        else if (event.key === 'Escape') {
+            event.preventDefault();
+            cancelChange();
+        }
+    });
+
+    titleElement.replaceWith(input);
+    input.focus();
+    input.select();
+};
+
+/**
  * Elimina una actividad por índice del array `activities` y actualiza persistencia/UI.
  *
  * @param {number} index Índice de la actividad a borrar.
@@ -574,3 +652,9 @@ activitySearch.addEventListener('input', () => {
         }
     })
 });
+
+/**
+ * Application entry point
+ */
+renderUserTags();
+renderUserActivities();

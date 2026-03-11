@@ -279,7 +279,6 @@
         flex-col
         items-stretch
         gap-1
-        pb-1
         lg:flex-1
         lg:flex-row
         lg:items-center
@@ -316,6 +315,7 @@
         flex
         flex-wrap
         items-center
+        pt-1
         gap-1
         w-full;
     }

@@ -290,6 +290,10 @@
   .text-white {
     color: var(--color-white);
   }
+  .blur {
+    --tw-blur: blur(8px);
+    filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
+  }
   .filter {
     filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
   }
@@ -680,7 +684,6 @@
     flex-direction: column;
     align-items: stretch;
     gap: calc(var(--spacing) * 1);
-    padding-bottom: calc(var(--spacing) * 1);
     @media (width >= 64rem) {
       flex: 1;
     }
@@ -727,6 +730,7 @@
     flex-wrap: wrap;
     align-items: center;
     gap: calc(var(--spacing) * 1);
+    padding-top: calc(var(--spacing) * 1);
   }
   .activity-item {
     position: relative;
