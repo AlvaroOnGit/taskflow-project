@@ -30,9 +30,6 @@ const activitySearch = document.getElementById('activity-filter-search');
 let tags = JSON.parse(localStorage.getItem('tags')) || [];
 let activities = JSON.parse(localStorage.getItem('activities')) || [];
 
-renderUserTags();
-renderUserActivities();
-
 const NOTIFICATION_TYPES = {
     success: 'notification--success',
     error: 'notification--error',
@@ -655,3 +652,9 @@ activitySearch.addEventListener('input', () => {
         }
     })
 });
+
+/**
+ * Application entry point
+ */
+renderUserTags();
+renderUserActivities();

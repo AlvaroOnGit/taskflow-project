@@ -217,9 +217,6 @@
   .inline {
     display: inline;
   }
-  .table {
-    display: table;
-  }
   .w-full {
     width: 100%;
   }
@@ -229,20 +226,11 @@
   .flex-1 {
     flex: 1;
   }
-  .border-collapse {
-    border-collapse: collapse;
-  }
   .cursor-pointer {
     cursor: pointer;
   }
-  .resize {
-    resize: both;
-  }
   .flex-col {
     flex-direction: column;
-  }
-  .flex-wrap {
-    flex-wrap: wrap;
   }
   .items-center {
     align-items: center;
@@ -250,14 +238,8 @@
   .justify-between {
     justify-content: space-between;
   }
-  .gap-0 {
-    gap: calc(var(--spacing) * 0);
-  }
   .gap-0\.5 {
     gap: calc(var(--spacing) * 0.5);
-  }
-  .gap-1 {
-    gap: calc(var(--spacing) * 1);
   }
   .gap-1\.5 {
     gap: calc(var(--spacing) * 1.5);
@@ -286,9 +268,6 @@
   .bg-primary {
     background-color: var(--color-primary);
   }
-  .p-0 {
-    padding: calc(var(--spacing) * 0);
-  }
   .p-0\.5 {
     padding: calc(var(--spacing) * 0.5);
   }
@@ -310,13 +289,6 @@
   }
   .text-white {
     color: var(--color-white);
-  }
-  .underline {
-    text-decoration-line: underline;
-  }
-  .outline {
-    outline-style: var(--tw-outline-style);
-    outline-width: 1px;
   }
   .blur {
     --tw-blur: blur(8px);
@@ -938,11 +910,6 @@ input[type="color"]::-moz-color-swatch {
   syntax: "*";
   inherits: false;
 }
-@property --tw-outline-style {
-  syntax: "*";
-  inherits: false;
-  initial-value: solid;
-}
 @property --tw-blur {
   syntax: "*";
   inherits: false;
@@ -1108,7 +1075,6 @@ input[type="color"]::-moz-color-swatch {
     *, ::before, ::after, ::backdrop {
       --tw-border-style: solid;
       --tw-font-weight: initial;
-      --tw-outline-style: solid;
       --tw-blur: initial;
       --tw-brightness: initial;
       --tw-contrast: initial;
