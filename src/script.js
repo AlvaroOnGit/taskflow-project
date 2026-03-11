@@ -27,6 +27,12 @@ const activityContainer = document.getElementById('activity-container');
 //Filters
 const activitySearch = document.getElementById('activity-filter-search');
 
+let tags = JSON.parse(localStorage.getItem('tags')) || [];
+let activities = JSON.parse(localStorage.getItem('activities')) || [];
+
+renderUserTags();
+renderUserActivities();
+
 const NOTIFICATION_TYPES = {
     success: 'notification--success',
     error: 'notification--error',
@@ -78,12 +84,6 @@ if (notificationContainer) {
 
 // Exponer helper de notificación globalmente
 window.showNotification = showNotification;
-
-let tags = JSON.parse(localStorage.getItem('tags')) || [];
-let activities = JSON.parse(localStorage.getItem('activities')) || [];
-
-renderUserTags();
-renderUserActivities();
 
 /**
  * Inicializa el tema (dark/light) cuando el DOM está listo.
@@ -152,6 +152,15 @@ sidebarMobileToggle.addEventListener('click', () => {
 function renderUserTags() {
 
     tagList.innerHTML = '';
+
+    if (tagForm) {
+
+        if (tags.length > 0) {
+            tagForm.classList.add('tag-menu-form--with-border');
+        } else {
+            tagForm.classList.remove('tag-menu-form--with-border');
+        }
+    }
 
     tags.forEach((tag, index) => {
         const li = document.createElement('li');

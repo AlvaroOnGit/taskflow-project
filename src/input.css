@@ -214,8 +214,12 @@
         pt-1
         pb-1
         gap-0.5
+    }
+
+    .tag-menu-form--with-border {
+        @apply
         border-b
-        border-border-primary
+        border-border-primary;
     }
 
     .tag-menu-button {

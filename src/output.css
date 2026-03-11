@@ -612,11 +612,13 @@
     display: flex;
     align-items: center;
     gap: calc(var(--spacing) * 0.5);
+    padding-top: calc(var(--spacing) * 1);
+    padding-bottom: calc(var(--spacing) * 1);
+  }
+  .tag-menu-form--with-border {
     border-bottom-style: var(--tw-border-style);
     border-bottom-width: 1px;
     border-color: var(--color-border-primary);
-    padding-top: calc(var(--spacing) * 1);
-    padding-bottom: calc(var(--spacing) * 1);
   }
   .tag-menu-button {
     height: calc(var(--spacing) * 2);
