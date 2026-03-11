@@ -65,7 +65,7 @@ function showNotification(message, type = 'success', seconds = 3) {
 }
 
 /**
- * Permite cerrar manualmente la notificación con el botón de dismiss.
+ * Permite cerrar manualmente la notificación pulsando en ella.
  */
 if (notificationContainer) {
 
