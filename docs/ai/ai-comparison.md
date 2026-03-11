@@ -1,4 +1,4 @@
-# AI Comparison: Claude - ChatGPT
+# Comparación IA: Claude - ChatGPT
 
 > **Proyecto:** Evaluación de asistentes de IA para desarrollo JavaScript  
 > **Asistentes evaluados:** Claude (Anthropic) / ChatGPT (OpenAI)
