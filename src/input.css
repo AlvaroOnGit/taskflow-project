@@ -488,6 +488,58 @@
         @apply
         border-emerald-400
     }
+
+    .activity-filter-footer {
+        @apply
+        flex
+        flex-col
+        items-center
+        justify-between
+        pt-0.5
+        mt-1
+        border-t
+        border-border-primary
+        gap-1
+        lg:flex-row
+    }
+
+    .activity-stats {
+        @apply
+        text-xs
+        opacity-60
+    }
+
+    .filters {
+        @apply
+        flex
+        flex-wrap
+        gap-1
+    }
+
+    .activity-filter-toggle {
+        @apply
+        flex
+        items-center
+        gap-0.5
+        text-xs
+        cursor-pointer
+        border
+        rounded-xl
+        border-border-primary
+        bg-medium-opacity
+        px-1
+        py-0.5
+        hover:bg-hover-primary
+        transition-colors
+        duration-200
+        shrink-0
+    }
+
+    .activity-filter-toggle--active {
+        @apply
+        border-emerald-500
+        text-emerald-400
+    }
 }
 
 :root {

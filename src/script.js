@@ -26,9 +26,13 @@ const activityComposerInput = document.getElementById('activity-composer-input')
 const activityContainer = document.getElementById('activity-container');
 //Filters
 const activitySearch = document.getElementById('activity-filter-search');
+const activityFilterCompleted = document.getElementById('activity-filter-completed');
+const activityFilterLabel = document.getElementById('activity-filter-completed-label');
+const activityStats = document.getElementById('activity-stats');
 
 let tags = JSON.parse(localStorage.getItem('tags')) || [];
 let activities = JSON.parse(localStorage.getItem('activities')) || [];
+let filterMode = 'all'; // 'all' | 'completed' | 'pending'
 
 const NOTIFICATION_TYPES = {
     success: 'notification--success',
@@ -399,13 +403,10 @@ function addTagToSelection(tagName, tagColor) {
 syncComposerTagsUI();
 
 /**
- * Renderiza la lista de actividades en `#activity-container`.
- * Cada actividad muestra:
- * - Título (`activity.name`)
- * - Etiquetas (`activity.tags`)
- * - Textarea de descripción (con autoresize y persistencia onBlur)
- *
- * Nota: `filter` existe, pero actualmente no se usa dentro de la función.
+ * Renderiza las actividades filtradas en `#activity-container`.
+ * Aplica simultáneamente el filtro de texto (`activitySearch`) y el filtro
+ * de estado (`filterMode`: 'all' | 'completed' | 'pending').
+ * Actualiza también el contador de estadísticas (`#activity-stats`).
  *
  * @returns {void}
  */
@@ -413,7 +414,24 @@ function renderUserActivities() {
 
     activityContainer.innerHTML = '';
 
-    activities.forEach((activity, index) => {
+    const searchTerm = activitySearch.value.toLowerCase();
+
+    const filtered = activities.filter(activity => {
+        const matchesSearch = activity.name.toLowerCase().includes(searchTerm);
+        const matchesFilter =
+            filterMode === 'all' ? true :
+                filterMode === 'completed' ? activity.completed :
+                    !activity.completed;
+        return matchesSearch && matchesFilter;
+    });
+
+    // Actualizar estadísticas
+    const totalVisible = filtered.length;
+    const completedVisible = filtered.filter(a => a.completed).length;
+    activityStats.textContent = `${totalVisible} actividades · ${completedVisible} completadas`;
+
+    filtered.forEach((activity, _) => {
+        const index = activities.indexOf(activity); // índice real para los handlers
 
         const li = document.createElement('li');
 
@@ -431,12 +449,12 @@ function renderUserActivities() {
                  <div class="activity-data">
                     <div class="activity-info">
                         <button 
-                    class="activity-complete-button${isCompleted ? ' activity-complete-button--done' : ''}" 
-                    onclick="toggleActivityComplete(${index})"
-                    title="${isCompleted ? 'Marcar como pendiente' : 'Marcar como completada'}"
-                >
-                    <span class="material-symbols-outlined">${isCompleted ? 'check_circle' : 'radio_button_unchecked'}</span>
-                </button>
+                            class="activity-complete-button${isCompleted ? ' activity-complete-button--done' : ''}" 
+                            onclick="toggleActivityComplete(${index})"
+                            title="${isCompleted ? 'Marcar como pendiente' : 'Marcar como completada'}"
+                        >
+                            <span class="material-symbols-outlined">${isCompleted ? 'check_circle' : 'radio_button_unchecked'}</span>
+                        </button>
                         <div class="activity-tags">
                             ${activityTags}
                         </div>
@@ -655,30 +673,37 @@ window.deleteUserActivity = (index) => {
 };
 
 /**
- * Filtra visualmente las actividades ya renderizadas según el texto de búsqueda.
- * Recorre los `<li>` y compara el término con el título (`.activity-info h3`),
- * ocultando/mostrando cada item mediante `li.style.display`.
+ * Cicla el modo de filtro entre 'all', 'completed' y 'pending'.
+ * Actualiza el label del botón, su estilo activo y re-renderiza las actividades.
  *
- * @listens HTMLInputElement#input
+ * Estados:
+ * - 'all'       → muestra todas las actividades (label: "Todas")
+ * - 'completed' → muestra solo completadas (label: "Completadas")
+ * - 'pending'   → muestra solo pendientes (label: "Pendientes")
+ *
+ * @listens HTMLElement#click
  * @returns {void}
  */
 activitySearch.addEventListener('input', () => {
+    renderUserActivities();
+});
 
-    const activityList = document.querySelectorAll('.activity-container li');
-
-    const searchTerm = activitySearch.value.toLowerCase();
-
-    activityList.forEach(li => {
-
-        const titleElement = li.querySelector('h3');
-
-        if (titleElement) {
-
-            const title = titleElement.textContent.toLowerCase();
-
-            li.style.display = title.includes(searchTerm) ? 'block' : 'none';
-        }
-    })
+activityFilterCompleted.addEventListener('click', () => {
+    if (filterMode === 'all') {
+        filterMode = 'completed';
+        activityFilterLabel.textContent = 'Completadas';
+        activityFilterCompleted.classList.add('activity-filter-toggle--active');
+    } else if (filterMode === 'completed') {
+        filterMode = 'pending';
+        activityFilterLabel.textContent = 'Pendientes';
+        activityFilterCompleted.classList.remove('activity-filter-toggle--active');
+        activityFilterCompleted.classList.add('activity-filter-toggle--active'); // mantiene active
+    } else {
+        filterMode = 'all';
+        activityFilterLabel.textContent = 'Todas';
+        activityFilterCompleted.classList.remove('activity-filter-toggle--active');
+    }
+    renderUserActivities();
 });
 
 /**
