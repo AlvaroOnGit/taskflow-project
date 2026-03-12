@@ -198,6 +198,9 @@
   }
 }
 @layer utilities {
+  .visible {
+    visibility: visible;
+  }
   .relative {
     position: relative;
   }
@@ -206,6 +209,9 @@
   }
   .m-0 {
     margin: calc(var(--spacing) * 0);
+  }
+  .mx-0\.5 {
+    margin-inline: calc(var(--spacing) * 0.5);
   }
   .flex {
     display: flex;
@@ -261,6 +267,13 @@
     border-style: var(--tw-border-style);
     border-width: 1px;
   }
+  .border-t {
+    border-top-style: var(--tw-border-style);
+    border-top-width: 1px;
+  }
+  .border-border-primary {
+    border-color: var(--color-border-primary);
+  }
   .bg-activity-delete {
     background-color: var(--color-activity-delete);
   }
@@ -269,6 +282,12 @@
   }
   .p-0\.5 {
     padding: calc(var(--spacing) * 0.5);
+  }
+  .p-1 {
+    padding: calc(var(--spacing) * 1);
+  }
+  .px-0\.5 {
+    padding-inline: calc(var(--spacing) * 0.5);
   }
   .text-center {
     text-align: center;
@@ -297,6 +316,9 @@
   }
   .opacity-50 {
     opacity: 50%;
+  }
+  .opacity-60 {
+    opacity: 60%;
   }
   .blur {
     --tw-blur: blur(8px);
@@ -945,12 +967,33 @@
     opacity: 60%;
   }
   .filters {
+    position: relative;
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
     gap: calc(var(--spacing) * 1);
+    @media (width >= 64rem) {
+      flex-direction: row;
+    }
+    @media (width >= 64rem) {
+      flex-wrap: wrap;
+    }
+  }
+  .activity-filter-tags-options {
+    position: absolute;
+    top: 100%;
+    left: calc(var(--spacing) * 0);
+    z-index: 20;
+    margin-top: calc(var(--spacing) * 1);
+    width: 100%;
+    background-color: var(--color-secondary);
+    &:where(.dark, .dark *) {
+      background-color: var(--color-secondary-dark);
+    }
   }
   .activity-filter-toggle {
     display: flex;
+    width: calc(var(--spacing) * 16);
     flex-shrink: 0;
     cursor: pointer;
     align-items: center;
@@ -973,6 +1016,9 @@
       @media (hover: hover) {
         background-color: var(--color-hover-primary);
       }
+    }
+    @media (width >= 64rem) {
+      width: calc(var(--spacing) * 8);
     }
   }
   .activity-filter-toggle--active {

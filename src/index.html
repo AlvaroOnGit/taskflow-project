@@ -54,10 +54,20 @@
             <input type="text" id="activity-filter-search" placeholder="Buscar actividad..." class="input" />
             <div class="activity-filter-footer">
                 <span id="activity-stats" class="activity-stats">0 actividades · 0 completadas</span>
-                <button id="activity-filter-completed" class="activity-filter-toggle" title="Mostrar solo completadas">
-                    <span class="material-symbols-outlined">filter_list</span>
-                    <span id="activity-filter-completed-label">Todas</span>
-                </button>
+                <div class="filters">
+                    <div class="relative">
+                        <button id="activity-filter-tags" class="activity-filter-toggle" title="Filtrar por etiquetas">
+                            <span class="material-symbols-outlined">label</span>
+                            <span id="activity-filter-tags-label">Etiquetas</span>
+                        </button>
+                        <ul id="activity-filter-tags-options" class="activity-tag-options activity-filter-tags-options hidden">
+                        </ul>
+                    </div>
+                    <button id="activity-filter-completed" class="activity-filter-toggle" title="Mostrar solo completadas">
+                        <span class="material-symbols-outlined">filter_list</span>
+                        <span id="activity-filter-completed-label">Todas</span>
+                    </button>
+                </div>
             </div>
         </section>
         <section class="activity-composer activity-panel">

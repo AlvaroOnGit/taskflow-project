@@ -105,13 +105,13 @@
 
     .notification--success {
         @apply bg-emerald-500;
-      }
-      .notification--error {
+    }
+    .notification--error {
         @apply bg-red-500;
-      }
-      .notification--warning {
+    }
+    .notification--warning {
         @apply bg-amber-500 text-black;
-      }
+    }
 
     .notification--visible {
         @apply
@@ -511,14 +511,31 @@
 
     .filters {
         @apply
+        relative
         flex
-        flex-wrap
+        flex-col
+        items-center
         gap-1
+        lg:flex-wrap
+        lg:flex-row
+    }
+
+    .activity-filter-tags-options {
+        @apply
+        absolute
+        top-full
+        left-0
+        w-full
+        mt-1
+        z-20
+        bg-secondary
+        dark:bg-secondary-dark
     }
 
     .activity-filter-toggle {
         @apply
         flex
+        w-16
         items-center
         gap-0.5
         text-xs
@@ -533,6 +550,7 @@
         transition-colors
         duration-200
         shrink-0
+        lg:w-8
     }
 
     .activity-filter-toggle--active {
