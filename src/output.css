@@ -969,14 +969,21 @@
   .filters {
     position: relative;
     display: flex;
+    width: 100%;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     gap: calc(var(--spacing) * 1);
+    @media (width >= 64rem) {
+      width: auto;
+    }
     @media (width >= 64rem) {
       flex-direction: row;
     }
     @media (width >= 64rem) {
       flex-wrap: wrap;
+    }
+    @media (width >= 64rem) {
+      align-items: center;
     }
   }
   .activity-filter-tags-options {
@@ -993,7 +1000,7 @@
   }
   .activity-filter-toggle {
     display: flex;
-    width: calc(var(--spacing) * 16);
+    width: 100%;
     flex-shrink: 0;
     cursor: pointer;
     align-items: center;

@@ -601,6 +601,10 @@ activityComposerForm.addEventListener('submit', (e) => {
         showNotification('Actividad no puede estar vacía', 'warning', 3);
         return;
     }
+    if (activityName.length > 50) {
+        showNotification('El título no puede superar los 50 caracteres', 'warning', 3);
+        return;
+    }
     if (activities.some(a => a.name === activityName)) {
         showNotification('Actividad ya existe', 'warning', 3);
         return;
@@ -648,6 +652,7 @@ function updateActivityDescription(index, newValue) {
 window.startEditActivityTitle = (index, titleElement) => {
     const currentName = activities[index]?.name ?? '';
     const input = document.createElement('input');
+    input.maxLength = 50;
     input.type = 'text';
     input.value = currentName;
     input.className = 'activity-title-input';
@@ -661,6 +666,11 @@ window.startEditActivityTitle = (index, titleElement) => {
 
         if (trimmedName === '') {
             showNotification('Actividad no puede estar vacía', 'warning', 3);
+            input.focus();
+            return;
+        }
+        if (trimmedName.length > 50) {
+            showNotification('El título no puede superar los 50 caracteres', 'warning', 3);
             input.focus();
             return;
         }
