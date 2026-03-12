@@ -9,7 +9,9 @@
       "Courier New", monospace;
     --color-red-500: oklch(63.7% 0.237 25.331);
     --color-amber-500: oklch(76.9% 0.188 70.08);
+    --color-emerald-400: oklch(76.5% 0.177 163.223);
     --color-emerald-500: oklch(69.6% 0.17 162.48);
+    --color-gray-400: oklch(70.7% 0.022 261.325);
     --color-neutral-400: oklch(70.8% 0 0);
     --color-black: #000;
     --color-white: #fff;
@@ -289,6 +291,12 @@
   }
   .text-white {
     color: var(--color-white);
+  }
+  .line-through {
+    text-decoration-line: line-through;
+  }
+  .opacity-50 {
+    opacity: 50%;
   }
   .blur {
     --tw-blur: blur(8px);
@@ -766,7 +774,7 @@
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
   .activity-data {
-    flex-direction: column;
+    flex-wrap: wrap;
     align-items: flex-start;
     justify-content: space-between;
     padding-right: calc(var(--spacing) * 0.5);
@@ -880,6 +888,41 @@
     --tw-font-weight: var(--font-weight-bold);
     font-weight: var(--font-weight-bold);
     color: var(--color-white);
+  }
+  .activity-complete-button {
+    display: flex;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: calc(var(--spacing) * 0.5);
+    color: var(--color-gray-400);
+    transition-property: all;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+    --tw-duration: 200ms;
+    transition-duration: 200ms;
+    &:hover {
+      @media (hover: hover) {
+        --tw-scale-x: 110%;
+        --tw-scale-y: 110%;
+        --tw-scale-z: 110%;
+        scale: var(--tw-scale-x) var(--tw-scale-y);
+      }
+    }
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-emerald-400);
+      }
+    }
+  }
+  .activity-complete-button--done {
+    color: var(--color-emerald-400);
+  }
+  .activity-item--completed {
+    border-color: var(--color-emerald-500);
+  }
+  .activity-item--completed:hover {
+    border-color: var(--color-emerald-400);
   }
 }
 :root {
