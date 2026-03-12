@@ -428,8 +428,7 @@ function renderUserActivities() {
 
         li.innerHTML = `
             <article class="activity-item${isCompleted ? ' activity-item--completed' : ''}">
-                 
-                <div class="activity-data">
+                 <div class="activity-data">
                     <div class="activity-info">
                         <button 
                     class="activity-complete-button${isCompleted ? ' activity-complete-button--done' : ''}" 
@@ -671,7 +670,7 @@ activitySearch.addEventListener('input', () => {
 
     activityList.forEach(li => {
 
-        const titleElement = li.querySelector('.activity-info h3');
+        const titleElement = li.querySelector('h3');
 
         if (titleElement) {
 
