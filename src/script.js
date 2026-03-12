@@ -110,14 +110,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /**
-    * Alterna el tema entre oscuro y claro.
-    * - Alterna la clase `dark` en `<html>`
-    * - Persiste el valor en `localStorage` (clave: `theme`)
-    * - Actualiza el icono del botón
-    *
-    * @listens HTMLElement#click
-    * @returns {void}
-    */
+     * Alterna el tema entre oscuro y claro.
+     * - Alterna la clase `dark` en `<html>`
+     * - Persiste el valor en `localStorage` (clave: `theme`)
+     * - Actualiza el icono del botón
+     *
+     * @listens HTMLElement#click
+     * @returns {void}
+     */
     themeIcon.addEventListener('click', () => {
 
         isDark = html.classList.toggle('dark');
@@ -290,7 +290,7 @@ let selectedTagsForNewActivity = [];
 tagSelector.onclick = (e) => {
 
     e.stopPropagation();
-    
+
     // Si no hay opciones disponibles, no abrir el desplegable
     if (tags.length === 0) {
         showNotification("Debes crear al menos una etiqueta", "warning", 3)
@@ -424,15 +424,25 @@ function renderUserActivities() {
             </span>
         `).join('');
 
+        const isCompleted = activity.completed || false;
+
         li.innerHTML = `
-            <article class="activity-item">
+            <article class="activity-item${isCompleted ? ' activity-item--completed' : ''}">
+                 
                 <div class="activity-data">
                     <div class="activity-info">
-                        <h3 onclick="startEditActivityTitle(${index}, this)">${activity.name}</h3>
+                        <button 
+                    class="activity-complete-button${isCompleted ? ' activity-complete-button--done' : ''}" 
+                    onclick="toggleActivityComplete(${index})"
+                    title="${isCompleted ? 'Marcar como pendiente' : 'Marcar como completada'}"
+                >
+                    <span class="material-symbols-outlined">${isCompleted ? 'check_circle' : 'radio_button_unchecked'}</span>
+                </button>
                         <div class="activity-tags">
                             ${activityTags}
                         </div>
                     </div>
+                    <h3 onclick="startEditActivityTitle(${index}, this)" class="${isCompleted ? 'line-through opacity-50' : ''}">${activity.name}</h3>
                     <textarea 
                         class="activity-description-input"
                         placeholder="Descripción de la actividad...."
@@ -509,6 +519,7 @@ activityComposerForm.addEventListener('submit', (e) => {
         name: activityName,
         tags: [...selectedTagsForNewActivity],
         description: '',
+        completed: false,
     }
 
     activities.push(newActivity);
@@ -615,6 +626,24 @@ window.startEditActivityTitle = (index, titleElement) => {
 };
 
 /**
+ * Alterna el estado de completado de una actividad por índice y persiste el cambio.
+ *
+ * @param {number} index Índice de la actividad en `activities`.
+ * @returns {void}
+ */
+window.toggleActivityComplete = (index) => {
+
+    activities[index].completed = !activities[index].completed;
+    const isNowComplete = activities[index].completed;
+    showNotification(
+        isNowComplete ? 'Actividad completada ✓' : 'Actividad marcada como pendiente',
+        isNowComplete ? 'success' : 'warning',
+        2
+    );
+    saveAndRenderActivities();
+};
+
+/**
  * Elimina una actividad por índice del array `activities` y actualiza persistencia/UI.
  *
  * @param {number} index Índice de la actividad a borrar.
@@ -654,7 +683,7 @@ activitySearch.addEventListener('input', () => {
 });
 
 /**
- * Application entry point
+ * Punto de entrada de la aplicación
  */
 renderUserTags();
 renderUserActivities();

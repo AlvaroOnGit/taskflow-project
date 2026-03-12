@@ -348,7 +348,7 @@
 
     .activity-data {
         @apply
-        flex-col
+        flex-wrap
         pr-0.5
         items-start
         justify-between
@@ -458,6 +458,35 @@
         mt-[2px]
         mr-[7px]
         cursor-pointer
+    }
+
+    .activity-complete-button {
+        @apply
+        pb-0.5
+        flex
+        items-center
+        justify-center
+        cursor-pointer
+        text-gray-400
+        transition-all
+        duration-200
+        hover:scale-110
+        hover:text-emerald-400
+    }
+
+    .activity-complete-button--done {
+        @apply
+        text-emerald-400
+    }
+
+    .activity-item--completed {
+        @apply
+        border-emerald-500
+    }
+
+    .activity-item--completed:hover {
+        @apply
+        border-emerald-400
     }
 }
 
