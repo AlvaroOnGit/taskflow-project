@@ -686,6 +686,10 @@ activityComposerForm.addEventListener('submit', async (e) => {
         showNotification('Actividad no puede estar vacía', 'warning', 3);
         return;
     }
+    if (activityName.length <= 3) {
+        showNotification('El título debe contener mínimo 3 caracteres', 'warning', 3);
+        return;
+    }
     if (activityName.length > 50) {
         showNotification('El título no puede superar los 50 caracteres', 'warning', 3);
         return;

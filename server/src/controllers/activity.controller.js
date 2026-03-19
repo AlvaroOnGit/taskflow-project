@@ -26,12 +26,12 @@ export class ActivityController {
         }
 
         if (name.trim().length < 3) {
-            const e = new ValidationError('Nombre debe tener mínimo 3 carácteres');
+            const e = new ValidationError('Nombre debe tener mínimo 3 caracteres');
             next(e);
         }
 
         if (name.trim().length > 50) {
-            const e = new ValidationError('Nombre no puede superar 50 carácteres');
+            const e = new ValidationError('Nombre no puede superar 50 caracteres');
             next(e);
         }
 
