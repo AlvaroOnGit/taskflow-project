@@ -1,28 +1,18 @@
+import { DuplicateError, NotFoundError } from "../middlewares/error.middleware.js";
+
 let tasks = [];
 
-export class ActivityModel {
+// noinspection JSCheckFunctionSignatures
+export class ActivityService {
 
     static async getActivities() {
         return tasks;
     }
 
-    static async createActivity(data) {
+    static async createActivity(name, tags) {
 
-        const { name, tags } = data;
-
-        if (!name || name.trim() === '') {
-            throw new Error('NO_NAME');
-        }
-
-        if (name.trim().length < 3) {
-            throw new Error('TOO_SHORT');
-        }
-
-        if (name.trim().length > 50) {
-            throw new Error('TOO_LONG');
-        }
         if (tasks.some(task => task.name === name.trim())) {
-            throw new Error('DUPLICATE');
+            throw new DuplicateError('Nombre ya existe');
         }
 
         const newActivity = {
@@ -39,13 +29,36 @@ export class ActivityModel {
 
     static async deleteActivity(id) {
 
-        const index  = tasks.findIndex(task => task.id === id);
+        const index= tasks.findIndex(task => task.id === id);
 
         if (index === -1) {
-            throw new Error('NOT_FOUND');
+            throw new NotFoundError('No se pudo encontrar la actividad');
         }
 
         const [deletedActivity] = tasks.splice(index, 1);
         return deletedActivity;
+    }
+
+    static async updateActivity(id, data) {
+
+        const task = tasks.find(task => task.id === id);
+
+        if (!task) {
+            throw new NotFoundError('No se pudo encontrar la actividad');
+        }
+
+        const { name, description, completed } = data;
+
+        if (name !== undefined) {
+            if (tasks.some(t => t.id !== id && t.name === name.trim())) {
+                throw new DuplicateError('Nombre ya existe');
+            }
+            task.name = name.trim();
+        }
+
+        if (description !== undefined) task.description = description;
+        if (completed !== undefined) task.completed = completed;
+
+        return task;
     }
 }

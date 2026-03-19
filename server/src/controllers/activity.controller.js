@@ -1,77 +1,103 @@
-import { errorHandler } from "../helpers/errorHandler.js";
+import { ValidationError } from "../middlewares/error.middleware.js";
 
+// noinspection JSCheckFunctionSignatures
 export class ActivityController {
 
-    constructor({ ActivityModel}) {
-        this.ActivityModel = ActivityModel;
+    constructor({ ActivityService}) {
+        this.ActivityService = ActivityService;
     }
 
-    httpGetActivities = async (req, res) => {
+    httpGetActivities = async (req, res, next) => {
         try {
-            const tasks = await this.ActivityModel.getActivities();
+            const tasks = await this.ActivityService.getActivities();
             return res.status(200).json(tasks);
 
         } catch (e) {
-            return errorHandler(res, 500, 'SERVER_ERROR', 'Error interno del servidor');
+            next(e);
         }
     }
-    httpCreateActivity = async (req, res) => {
+    httpCreateActivity = async (req, res, next) => {
 
-        const data = req.body;
+        const { name, tags } = req.body;
 
-        if (!data.name) {
-            return errorHandler(res, 400, 'NO_NAME', 'Nombre es requerido');
+        if (!name || name.trim() === '') {
+            const e = new ValidationError('Nombre es requerido');
+            next(e);
         }
 
-        if (typeof data.name !== 'string') {
-            return errorHandler(res, 400, 'INVALID_TYPE', 'El nombre debe ser un string');
+        if (name.trim().length < 3) {
+            const e = new ValidationError('Nombre debe tener mínimo 3 carácteres');
+            next(e);
         }
 
-        if (data.tags !== undefined && !Array.isArray(data.tags)) {
-            return errorHandler(res, 400, 'INVALID_TAGS', 'Los tags deben ser un array');
+        if (name.trim().length > 50) {
+            const e = new ValidationError('Nombre no puede superar 50 carácteres');
+            next(e);
         }
 
         try {
-            const newActivity = await this.ActivityModel.createActivity(data);
+            const newActivity = await this.ActivityService.createActivity(name, tags);
             return res.status(200).json({ activity: newActivity , message: 'Activity created successfully'});
         } catch (e) {
-            switch (e.message) {
-                case 'NO_NAME':
-                    return errorHandler(res, 400, 'NO_NAME', 'El nombre de la actividad no puede estar vacío');
-                case 'TOO_SHORT':
-                    return errorHandler(res, 400, 'TOO_SHORT', 'El nombre debe contener al menos 3 caracteres');
-                case 'TOO_LONG':
-                    return errorHandler(res, 400, 'TOO_LONG', 'El nombre no debe superar los 50 caracteres');
-                case 'DUPLICATE':
-                    return errorHandler(res, 400, 'DUPLICATE', 'Ya existe una actividad con este nombre');
-                default:
-                    return errorHandler(res, 500, 'SERVER_ERROR', 'Error interno del servidor');
-            }
+            next(e);
         }
     }
-    httpDeleteActivity = async (req, res) => {
+    httpDeleteActivity = async (req, res, next) => {
 
         const id = Number(req.params.id);
 
-        console.log(id)
-
         if (!id) {
-            return errorHandler(res, 400, 'NO_ID', 'Id es requerido');
+            const e = new ValidationError('Id es requerido');
+            next(e);
         }
         if (isNaN(id)) {
-            return errorHandler(res, 400, 'INVALID_TYPE', 'Id debe ser un número');
+            const e = new ValidationError('Id debe ser un número');
+            next(e);
         }
 
         try {
-            await this.ActivityModel.deleteActivity(id);
+            await this.ActivityService.deleteActivity(id);
             return res.status(204).send();
         } catch (e) {
-            switch (e.message) {
-                case 'NOT_FOUND':
-                    return errorHandler(res, 404, 'NOT_FOUND', 'Actividad no se pudo encontrar');
-                default:
-                    return errorHandler(res, 500, 'SERVER_ERROR', 'Error interno del servidor');
+            next(e);
+        }
+    }
+    httpUpdateActivity = async (req, res, next) => {
+
+        const id = Number(req.params.id);
+
+        if (!id || isNaN(id)) {
+            const e = new ValidationError('Id debe ser un número válido')
+            next(e);
+        }
+
+        const { name, description, completed } = req.body;
+
+        if (name !== undefined) {
+            if (name.trim() === '') {
+                const e = new ValidationError('Nombre no puede estar vacío');
+                next(e);
             }
+            if (name.trim().length < 3) {
+                const e = new ValidationError('Nombre debe tener mínimo 3 carácteres');
+                next(e);
+            }
+            if (name.trim().length > 50) {
+                const e = new ValidationError('Nombre no puede superar 50 carácteres');
+                next(e);
+            }
+        }
+
+        if (completed !== undefined && typeof completed !== 'boolean') {
+            const e = new ValidationError('completed debe ser un booleano');
+            next(e);
+        }
+
+        try {
+            const updated = await this.ActivityService.updateActivity(id, { name, description, completed });
+            return res.status(200).json({ activity: updated, message: 'Activity updated successfully' });
+        } catch (e) {
+            next(e);
         }
     }
 }
