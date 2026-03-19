@@ -1,3 +1,5 @@
+import { getActivities, createActivity, updateActivity, deleteActivity } from './api/client.js';
+
 // ─── Referencias DOM ─────────────────────────────────────────────────────────
 
 // Cabecera
@@ -40,8 +42,8 @@ const activityFilterTagsOptions = document.getElementById('activity-filter-tags-
 /** @type {{ name: string, color: string }[]} Lista de etiquetas persistidas. */
 let tags = JSON.parse(localStorage.getItem('tags')) || [];
 
-/** @type {{ name: string, tags: {name:string,color:string}[], description: string, completed: boolean }[]} Lista de actividades persistidas. */
-let activities = JSON.parse(localStorage.getItem('activities')) || [];
+/** @type {{ id: number, name: string, tags: {name:string,color:string}[], description: string, completed: boolean }[]} Lista de actividades cargadas desde el servidor. */
+let activities = [];
 
 /** @type {'all'|'completed'|'pending'} Modo de filtro de estado de actividades. */
 let filterMode = 'all';
@@ -485,6 +487,41 @@ activityFilterTagsBtn.addEventListener('click', (e) => {
     activityFilterTagsOptions.classList.toggle('hidden');
 });
 
+// ─── API: actividades ─────────────────────────────────────────────────────────
+
+/**
+ * Carga todas las actividades desde el servidor y re-renderiza la lista.
+ *
+ * @returns {Promise<void>}
+ */
+async function fetchActivities() {
+    try {
+        activities = await getActivities();
+        renderUserActivities();
+    } catch (e) {
+        showNotification('No se pudieron cargar las actividades', 'error', 4);
+    }
+}
+
+/**
+ * Envía un PATCH al servidor para actualizar campos concretos de una actividad.
+ * Recarga la lista desde el servidor tras el cambio.
+ *
+ * @param {number} id - ID de la actividad a actualizar.
+ * @param {Partial<{name:string, description:string, completed:boolean}>} data - Campos a actualizar.
+ * @returns {Promise<boolean>} `true` si la operación tuvo éxito.
+ */
+async function patchActivity(id, data) {
+    try {
+        await updateActivity(id, data);
+        await fetchActivities();
+        return true;
+    } catch (e) {
+        showNotification(e.message || 'Error al actualizar', 'error', 3);
+        return false;
+    }
+}
+
 // ─── Actividades ──────────────────────────────────────────────────────────────
 
 /**
@@ -515,8 +552,6 @@ function renderUserActivities() {
     activityStats.textContent = `${totalVisible} actividades · ${completedVisible} completadas`;
 
     filtered.forEach((activity) => {
-        const index = activities.indexOf(activity);
-
         const li = document.createElement('li');
         const isCompleted = activity.completed || false;
 
@@ -533,7 +568,7 @@ function renderUserActivities() {
                     <div class="activity-info">
                         <button
                             class="activity-complete-button${isCompleted ? ' activity-complete-button--done' : ''}"
-                            onclick="toggleActivityComplete(${index})"
+                            onclick="toggleActivityComplete(${activity.id})"
                             title="${isCompleted ? 'Marcar como pendiente' : 'Marcar como completada'}"
                         >
                             <span class="material-symbols-outlined">${isCompleted ? 'check_circle' : 'radio_button_unchecked'}</span>
@@ -542,16 +577,16 @@ function renderUserActivities() {
                             ${activityTags}
                         </div>
                     </div>
-                    <h3 onclick="startEditActivityTitle(${index}, this)" class="${isCompleted ? 'line-through opacity-50' : ''}">${activity.name}</h3>
+                    <h3 onclick="startEditActivityTitle(${activity.id}, this)" class="${isCompleted ? 'line-through opacity-50' : ''}">${activity.name}</h3>
                     <textarea
                         class="activity-description-input"
                         placeholder="Descripción de la actividad...."
                         oninput="autoResize(this)"
-                        onblur="updateActivityDescription(${index}, this.value)"
+                        onblur="updateActivityDescription(${activity.id}, this.value)"
                     >${activity.description || ''}</textarea>
                     <div class="activity-delete group">
                         <div class="activity-delete-background"></div>
-                        <button class="activity-delete-button" onclick="deleteUserActivity(${index})">X</button>
+                        <button class="activity-delete-button" onclick="deleteUserActivity(${activity.id})">X</button>
                     </div>
                 </div>
             </article>
@@ -574,25 +609,15 @@ function autoResize(textarea) {
 }
 
 /**
- * Persiste el array `activities` en `localStorage` y re-renderiza la lista.
- *
- * @returns {void}
- */
-function saveAndRenderActivities() {
-    localStorage.setItem('activities', JSON.stringify(activities));
-    renderUserActivities();
-}
-
-/**
- * Crea una nueva actividad a partir del formulario del compositor.
- * Valida que el nombre no esté vacío ni sea duplicado.
+ * Crea una nueva actividad enviando un POST al servidor.
+ * Valida que el nombre no esté vacío antes de enviar.
  * Tras crear la actividad, resetea las etiquetas seleccionadas y el input.
  *
  * @param {SubmitEvent} e - Evento de submit del formulario.
  * @listens HTMLFormElement#submit
- * @returns {void}
+ * @returns {Promise<void>}
  */
-activityComposerForm.addEventListener('submit', (e) => {
+activityComposerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const activityName = activityComposerInput.value.trim();
@@ -605,35 +630,28 @@ activityComposerForm.addEventListener('submit', (e) => {
         showNotification('El título no puede superar los 50 caracteres', 'warning', 3);
         return;
     }
-    if (activities.some(a => a.name === activityName)) {
-        showNotification('Actividad ya existe', 'warning', 3);
-        return;
+
+    try {
+        await createActivity(activityName, [...selectedTagsForNewActivity]);
+        showNotification('Actividad creada', 'success', 3);
+        selectedTagsForNewActivity.length = 0;
+        activityComposerInput.value = '';
+        syncComposerTagsUI();
+        await fetchActivities();
+    } catch (e) {
+        showNotification(e.message || 'Error al crear actividad', 'error', 3);
     }
-
-    activities.push({
-        name: activityName,
-        tags: [...selectedTagsForNewActivity],
-        description: '',
-        completed: false,
-    });
-
-    showNotification('Actividad creada', 'success', 3);
-    selectedTagsForNewActivity.length = 0;
-    activityComposerInput.value = '';
-    syncComposerTagsUI();
-    saveAndRenderActivities();
 });
 
 /**
- * Actualiza la descripción de una actividad y persiste el cambio.
+ * Actualiza la descripción de una actividad enviando un PATCH al servidor.
  *
- * @param {number} index - Índice de la actividad en `activities`.
+ * @param {number} id - ID de la actividad.
  * @param {string} newValue - Nuevo texto de descripción.
- * @returns {void}
+ * @returns {Promise<void>}
  */
-function updateActivityDescription(index, newValue) {
-    activities[index].description = newValue;
-    saveAndRenderActivities();
+async function updateActivityDescription(id, newValue) {
+    await patchActivity(id, { description: newValue });
 }
 
 /**
@@ -645,12 +663,13 @@ function updateActivityDescription(index, newValue) {
  *
  * Valida que el nuevo nombre no esté vacío ni sea duplicado.
  *
- * @param {number} index - Índice de la actividad en `activities`.
+ * @param {number} id - ID de la actividad.
  * @param {HTMLElement} titleElement - Elemento `<h3>` que se reemplaza por el input.
  * @returns {void}
  */
-window.startEditActivityTitle = (index, titleElement) => {
-    const currentName = activities[index]?.name ?? '';
+window.startEditActivityTitle = (id, titleElement) => {
+    const activity = activities.find(a => a.id === id);
+    const currentName = activity?.name ?? '';
     const input = document.createElement('input');
     input.maxLength = 50;
     input.type = 'text';
@@ -659,7 +678,7 @@ window.startEditActivityTitle = (index, titleElement) => {
 
     let isCancelled = false;
 
-    const commitChange = () => {
+    const commitChange = async () => {
         if (isCancelled) return;
 
         const trimmedName = input.value.trim();
@@ -674,15 +693,9 @@ window.startEditActivityTitle = (index, titleElement) => {
             input.focus();
             return;
         }
-        if (activities.some((a, i) => i !== index && a.name === trimmedName)) {
-            showNotification('Ya existe otra actividad con ese nombre', 'warning', 3);
-            input.focus();
-            return;
-        }
 
-        activities[index].name = trimmedName;
-        saveAndRenderActivities();
-        showNotification('Actividad actualizada', 'success', 3);
+        const ok = await patchActivity(id, { name: trimmedName });
+        if (ok) showNotification('Actividad actualizada', 'success', 3);
     };
 
     const cancelChange = () => {
@@ -702,32 +715,38 @@ window.startEditActivityTitle = (index, titleElement) => {
 };
 
 /**
- * Alterna el estado completado/pendiente de una actividad y persiste el cambio.
+ * Alterna el estado completado/pendiente de una actividad enviando un PATCH al servidor.
  * Muestra una notificación informando del nuevo estado.
  *
- * @param {number} index - Índice de la actividad en `activities`.
- * @returns {void}
+ * @param {number} id - ID de la actividad.
+ * @returns {Promise<void>}
  */
-window.toggleActivityComplete = (index) => {
-    activities[index].completed = !activities[index].completed;
-    const isNowComplete = activities[index].completed;
-    showNotification(
-        isNowComplete ? 'Actividad completada ✓' : 'Actividad marcada como pendiente',
-        isNowComplete ? 'success' : 'warning',
-        2
-    );
-    saveAndRenderActivities();
+window.toggleActivityComplete = async (id) => {
+    const activity = activities.find(a => a.id === id);
+    const isNowComplete = !activity.completed;
+    const ok = await patchActivity(id, { completed: isNowComplete });
+    if (ok) {
+        showNotification(
+            isNowComplete ? 'Actividad completada ✓' : 'Actividad marcada como pendiente',
+            isNowComplete ? 'success' : 'warning',
+            2
+        );
+    }
 };
 
 /**
- * Elimina una actividad por su índice en `activities` y persiste el cambio.
+ * Elimina una actividad enviando un DELETE al servidor.
  *
- * @param {number} index - Índice de la actividad a eliminar.
- * @returns {void}
+ * @param {number} id - ID de la actividad a eliminar.
+ * @returns {Promise<void>}
  */
-window.deleteUserActivity = (index) => {
-    activities.splice(index, 1);
-    saveAndRenderActivities();
+window.deleteUserActivity = async (id) => {
+    try {
+        await deleteActivity(id);
+        await fetchActivities();
+    } catch (e) {
+        showNotification(e.message || 'Error al eliminar actividad', 'error', 3);
+    }
 };
 
 // ─── Filtro: completadas / pendientes ─────────────────────────────────────────
@@ -768,4 +787,4 @@ activityFilterCompleted.addEventListener('click', () => {
 renderUserTags();
 syncComposerTagsUI();
 syncTagFilterUI();
-renderUserActivities();
+fetchActivities();
