@@ -54,6 +54,9 @@ let filterTags = [];
 /** @type {{ name: string, color: string }[]} Etiquetas seleccionadas para la próxima actividad a crear. */
 let selectedTagsForNewActivity = [];
 
+/** @type {boolean} Indica si hay una petición al servidor en curso. */
+let isLoading = false;
+
 // ─── Notificación ─────────────────────────────────────────────────────────────
 
 /**
@@ -487,19 +490,71 @@ activityFilterTagsBtn.addEventListener('click', (e) => {
     activityFilterTagsOptions.classList.toggle('hidden');
 });
 
+// ─── Estados de carga ─────────────────────────────────────────────────────────
+
+/**
+ * Activa o desactiva el estado de carga global.
+ * Deshabilita el formulario compositor y muestra el estado en la lista.
+ *
+ * @param {boolean} loading
+ * @returns {void}
+ */
+function setLoading(loading) {
+    isLoading = loading;
+    activityComposerForm.querySelectorAll('input, button, textarea').forEach(el => {
+        el.disabled = loading;
+    });
+}
+
+/**
+ * Muestra el estado de carga en el contenedor de actividades.
+ *
+ * @returns {void}
+ */
+function renderLoadingState() {
+    activityContainer.innerHTML = `
+        <li class="activity-state-container">
+            <span class="activity-state-spinner"></span>
+            <p class="activity-state-text">Cargando actividades...</p>
+        </li>
+    `;
+}
+
+/**
+ * Muestra el estado de error en el contenedor de actividades con opción de reintentar.
+ *
+ * @param {string} [message='No se pudieron cargar las actividades']
+ * @returns {void}
+ */
+function renderErrorState(message = 'No se pudieron cargar las actividades') {
+    activityContainer.innerHTML = `
+        <li class="activity-state-container">
+            <span class="material-symbols-outlined activity-state-icon activity-state-icon--error">wifi_off</span>
+            <p class="activity-state-text">${message}</p>
+            <button class="activity-state-retry" onclick="fetchActivities()">Reintentar</button>
+        </li>
+    `;
+}
+
 // ─── API: actividades ─────────────────────────────────────────────────────────
 
 /**
  * Carga todas las actividades desde el servidor y re-renderiza la lista.
+ * Gestiona los estados de carga y error visualmente.
  *
  * @returns {Promise<void>}
  */
 async function fetchActivities() {
+    setLoading(true);
+    renderLoadingState();
     try {
         activities = await getActivities();
         renderUserActivities();
     } catch (e) {
+        renderErrorState();
         showNotification('No se pudieron cargar las actividades', 'error', 4);
+    } finally {
+        setLoading(false);
     }
 }
 
@@ -512,13 +567,18 @@ async function fetchActivities() {
  * @returns {Promise<boolean>} `true` si la operación tuvo éxito.
  */
 async function patchActivity(id, data) {
+    setLoading(true);
+    renderLoadingState();
     try {
         await updateActivity(id, data);
         await fetchActivities();
         return true;
     } catch (e) {
         showNotification(e.message || 'Error al actualizar', 'error', 3);
+        renderUserActivities();
         return false;
+    } finally {
+        setLoading(false);
     }
 }
 
@@ -631,15 +691,20 @@ activityComposerForm.addEventListener('submit', async (e) => {
         return;
     }
 
+    setLoading(true);
+    renderLoadingState();
     try {
         await createActivity(activityName, [...selectedTagsForNewActivity]);
+        await fetchActivities();
         showNotification('Actividad creada', 'success', 3);
         selectedTagsForNewActivity.length = 0;
         activityComposerInput.value = '';
         syncComposerTagsUI();
-        await fetchActivities();
     } catch (e) {
         showNotification(e.message || 'Error al crear actividad', 'error', 3);
+        renderUserActivities();
+    } finally {
+        setLoading(false);
     }
 });
 
@@ -741,11 +806,17 @@ window.toggleActivityComplete = async (id) => {
  * @returns {Promise<void>}
  */
 window.deleteUserActivity = async (id) => {
+    setLoading(true);
+    renderLoadingState();
     try {
         await deleteActivity(id);
         await fetchActivities();
+        showNotification('Actividad eliminada', 'success', 3);
     } catch (e) {
         showNotification(e.message || 'Error al eliminar actividad', 'error', 3);
+        renderUserActivities();
+    } finally {
+        setLoading(false);
     }
 };
 
@@ -784,6 +855,7 @@ activityFilterCompleted.addEventListener('click', () => {
 
 // ─── Inicialización ───────────────────────────────────────────────────────────
 
+window.fetchActivities = fetchActivities;
 renderUserTags();
 syncComposerTagsUI();
 syncTagFilterUI();
