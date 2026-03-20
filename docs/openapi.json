@@ -1,0 +1,406 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Activities API",
+    "description": "API REST para la gestión de actividades con soporte de etiquetas.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api",
+      "description": "Servidor local"
+    },
+    {
+      "url": "https://taskflow-project-imrp.vercel.app/api",
+      "description": "Servidor en Vercel"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Activities",
+      "description": "Operaciones sobre actividades"
+    }
+  ],
+  "paths": {
+    "/activities": {
+      "get": {
+        "tags": ["Activities"],
+        "summary": "Obtener todas las actividades",
+        "operationId": "getActivities",
+        "responses": {
+          "200": {
+            "description": "Lista de actividades",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Activity"
+                  }
+                },
+                "example": [
+                  {
+                    "id": 1748392847291,
+                    "name": "Test Activity",
+                    "description": "",
+                    "tags": [{ "name": "Test Tag", "color": "#32a852" }],
+                    "completed": false
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Activities"],
+        "summary": "Crear una actividad",
+        "operationId": "createActivity",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateActivityBody"
+              },
+              "example": {
+                "name": "Test Activity 2",
+                "tags": [{ "name": "Test Tag 2", "color": "#32a852" }]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Actividad creada correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivityResponse"
+                },
+                "example": {
+                  "activity": {
+                    "id": 1748392847291,
+                    "name": "Test Activity 2",
+                    "description": "",
+                    "tags": [{ "name": "Test Tag 2", "color": "#32a852" }],
+                    "completed": false
+                  },
+                  "message": "Activity created successfully"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos de entrada inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "nameRequired": {
+                    "summary": "name ausente o vacío",
+                    "value": { "message": "Nombre es requerido", "errors": {} }
+                  },
+                  "nameTooShort": {
+                    "summary": "name menor de 3 caracteres",
+                    "value": { "message": "Nombre debe tener mínimo 3 caracteres", "errors": {} }
+                  },
+                  "nameTooLong": {
+                    "summary": "name mayor de 50 caracteres",
+                    "value": { "message": "Nombre no puede superar 50 caracteres", "errors": {} }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "El nombre ya existe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": { "message": "Nombre ya existe", "errors": {} }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/activities/{id}": {
+      "patch": {
+        "tags": ["Activities"],
+        "summary": "Actualizar una actividad parcialmente",
+        "operationId": "updateActivity",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ActivityId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateActivityBody"
+              },
+              "example": {
+                "name": "Actividad actualizada",
+                "description": "Nueva descripción",
+                "completed": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Actividad actualizada correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivityResponse"
+                },
+                "example": {
+                  "activity": {
+                    "id": 1748392847291,
+                    "name": "Actividad actualizada",
+                    "description": "Nueva descripción",
+                    "tags": [],
+                    "completed": true
+                  },
+                  "message": "Activity updated successfully"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos de entrada inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalidId": {
+                    "summary": "id no numérico",
+                    "value": { "message": "Id debe ser un número válido", "errors": {} }
+                  },
+                  "nameEmpty": {
+                    "summary": "name vacío",
+                    "value": { "message": "Nombre no puede estar vacío", "errors": {} }
+                  },
+                  "nameTooShort": {
+                    "summary": "name menor de 3 caracteres",
+                    "value": { "message": "Nombre debe tener mínimo 3 carácteres", "errors": {} }
+                  },
+                  "nameTooLong": {
+                    "summary": "name mayor de 50 caracteres",
+                    "value": { "message": "Nombre no puede superar 50 carácteres", "errors": {} }
+                  },
+                  "completedNotBoolean": {
+                    "summary": "completed no es booleano",
+                    "value": { "message": "completed debe ser un booleano", "errors": {} }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Actividad no encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": { "message": "No se pudo encontrar la actividad", "errors": {} }
+              }
+            }
+          },
+          "409": {
+            "description": "El nombre ya existe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": { "message": "Nombre ya existe", "errors": {} }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Activities"],
+        "summary": "Eliminar una actividad",
+        "operationId": "deleteActivity",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ActivityId"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Actividad eliminada correctamente"
+          },
+          "400": {
+            "description": "ID inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "idRequired": {
+                    "summary": "id ausente",
+                    "value": { "message": "Id es requerido", "errors": {} }
+                  },
+                  "idNotNumber": {
+                    "summary": "id no numérico",
+                    "value": { "message": "Id debe ser un número", "errors": {} }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Actividad no encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": { "message": "No se pudo encontrar la actividad", "errors": {} }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "ActivityId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "ID numérico de la actividad (generado con Date.now())",
+        "schema": {
+          "type": "integer",
+          "example": 1748392847291
+        }
+      }
+    },
+    "schemas": {
+      "Tag": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Backend"
+          },
+          "color": {
+            "type": "string",
+            "pattern": "^#[0-9a-fA-F]{6}$",
+            "example": "#32a852"
+          }
+        },
+        "required": ["name", "color"]
+      },
+      "Activity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Timestamp Unix generado con Date.now()",
+            "example": 1748392847291
+          },
+          "name": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 50,
+            "example": "Test Activity"
+          },
+          "description": {
+            "type": "string",
+            "example": ""
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          },
+          "completed": {
+            "type": "boolean",
+            "example": false
+          }
+        }
+      },
+      "CreateActivityBody": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 50,
+            "example": "Test Activity 2"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            },
+            "default": []
+          }
+        }
+      },
+      "UpdateActivityBody": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 50,
+            "example": "Updated Activity"
+          },
+          "description": {
+            "type": "string",
+            "example": "Nueva descripción"
+          },
+          "completed": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "ActivityResponse": {
+        "type": "object",
+        "properties": {
+          "activity": {
+            "$ref": "#/components/schemas/Activity"
+          },
+          "message": {
+            "type": "string",
+            "example": "Activity created successfully"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Nombre es requerido"
+          },
+          "errors": {
+            "type": "object",
+            "example": {}
+          }
+        }
+      }
+    }
+  }
+}
