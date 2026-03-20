@@ -1,4 +1,4 @@
-import { getActivities, createActivity, updateActivity, deleteActivity } from './api/client.js';
+import { getActivities, createActivity, updateActivity, deleteActivity } from './client.js';
 
 // ─── Referencias DOM ─────────────────────────────────────────────────────────
 
