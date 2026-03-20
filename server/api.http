@@ -13,6 +13,38 @@ Content-Type: application/json
     }
   ]
 }
+### POST 400 - Name too short
+POST http://localhost:3000/api/activities
+Content-Type: application/json
+
+{
+  "name": "AB"
+}
+### POST 409 - Duplicated name
+POST http://localhost:3000/api/activities
+Content-Type: application/json
+
+{
+  "name": "Test Activity 2"
+}
 ### DELETE an activity
 DELETE http://localhost:3000/api/activities/1773921587185
+### DELETE 404 - Non existent ID
+DELETE http://localhost:3000/api/activities/0000000000000
+### PATCH an activity
+PATCH http://localhost:3000/api/activities/1773921587185
+Content-Type: application/json
+
+{
+  "name": "Updated activity",
+  "description": "New desc",
+  "completed": true
+}
+### PATCH 400 - completed isnt a boolean
+PATCH http://localhost:3000/api/activities/1773921587185
+Content-Type: application/json
+
+{
+  "completed": "true"
+}
 ###
